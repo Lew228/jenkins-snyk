@@ -18,12 +18,9 @@ stage('Snyk IaC Scan Test') {
             steps {
                 withCredentials([string(credentialsId: 'snyk-api-token-string', variable: 'SNYK_TOKEN')]) {
                     sh '''
-                        # Define the absolute path to the binary
-                        SNYK_EXE="/var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation/snyk/snyk"
-                        
-                        # Use the variable to run the commands
-                        $SNYK_EXE auth $SNYK_TOKEN
-                        $SNYK_EXE iac test --org=$SNYK_ORG --severity-threshold=high || true
+                        echo "--- Checking Tool Directory ---"
+                        find /var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation -name "snyk*"
+                        echo "--- End Check ---"
                     '''
                 }
             }
