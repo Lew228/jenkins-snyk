@@ -14,14 +14,18 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Snyk IaC Scan Test') {
+stage('Snyk IaC Scan Test') {
             steps {
                 withCredentials([string(credentialsId: 'snyk-api-token-string', variable: 'SNYK_TOKEN')]) {
                     sh '''
-                        export PATH=$PATH:/var/lib/jenkins/tools/io.snyk.jenkins.tools.SnykInstallation/snyk
-                        snyk-linux auth $SNYK_TOKEN
-                        snyk-linux iac test --org=$SNYK_ORG --severity-threshold=high || true
+                        # 1. Point to the correct path inside the Docker container
+                        export PATH=$PATH:/var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation/snyk
+                        
+                        # 2. Use 'snyk' instead of 'snyk-linux'
+                        snyk auth $SNYK_TOKEN
+                        
+                        # 3. Run the scan (this prints the report to your console)
+                        snyk iac test --org=$SNYK_ORG --severity-threshold=high || true
                     '''
                 }
             }
