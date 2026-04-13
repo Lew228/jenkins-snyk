@@ -17,10 +17,14 @@ pipeline {
 stage('Snyk IaC Scan Test') {
             steps {
                 withCredentials([string(credentialsId: 'snyk-api-token-string', variable: 'SNYK_TOKEN')]) {
-                    sh '''
-                        echo "--- Checking Tool Directory ---"
-                        find /var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation -name "snyk*"
-                        echo "--- End Check ---"
+                   sh '''
+                        # The exact path revealed by our find command
+                        SNYK_BIN="/var/jenkins_home/tools/io.snyk.jenkins.tools.SnykInstallation/snyk/snyk-linux"
+                        
+                        $SNYK_BIN auth $SNYK_TOKEN
+                        
+                        # This will print the full report to your console output
+                        $SNYK_BIN iac test --org=$SNYK_ORG --severity-threshold=high || true
                     '''
                 }
             }
